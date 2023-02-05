@@ -1,80 +1,53 @@
-import { useSessionStore } from '../stores/session'
-import axios from 'axios'
+import { useSessionStore } from "../stores/session";
+import axios from "axios";
 
 export default class ClasseVivaAPI {
+	apiUrl = "https://web.spaggiari.eu/rest/v1";
+	devApiKey = "+zorro+";
+	sessionStore = useSessionStore();
 
-    apiUrl = 'https://web.spaggiari.eu/rest/v1'
-    devApiKey = '+zorro+'
-    sessionStore = useSessionStore()
+	constructor() {}
 
-    constructor() {
-        axios.defaults.baseURL = this.apiUrl
-    }
+	async getProfile() {}
 
-    async getProfile() {
+	async login(username: String, password: String): Promise<any> {
+		try {
+			const loginResult = await axios.post(
+				`${this.apiUrl}/auth/login`,
+				{
+					ident: username,
+					uid: username,
+					pass: password
+				},
+				{
+					headers: {
+						"Content-Type": "application/json",
+						"Z-Dev-Apikey": this.devApiKey,
+						"User-Agent": "zorro/1.0"
+					}
+				}
+			);
+			return loginResult;
+		} catch (error: any) {
+			return Promise.reject(error.response.data);
+		}
+	}
 
-    }
+	getFinalGrades() {}
 
-    getFinalGrades() {
+	getDocuments() {}
 
-    }
+	getNotes() {}
 
-    getDocuments() {
+	getLessons() {}
 
-    }
+	getHomework() {}
 
-    getNotes() {
+	getGrades() {}
 
-    }
+	getAbsences() {}
 
-    getLessons() {
-
-    }
-
-    getHomework() {
-
-    }
-
-    getGrades() {
-
-    }
-
-    getAbsences() {
-
-    }
-
-    async login(username: String, password: String) {
-        const loginResult = await axios.post(`/auth/login`,
-        {
-            ident: username,
-            pass: password,
-            uid: username
-        },
-        {
-            headers: {
-                'Content-Type': 'application/json',
-                'Z-Dev-Apikey': this.devApiKey,
-                'User-Agent': 'zorro/1.0'
-            }
-        })
-        // const loginResult = await (await fetch(`${this.apiUrl}/auth/login`, {
-        //     method: 'POST',
-        //     headers: {
-        //         'User-Agent': 'CVVS/std/4.2.2 Android/11',
-        //         'Content-Type': 'application/json',
-        //         'z-dev-apikey': this.devApiKey,
-        //     },
-        //     body: JSON.stringify({
-        //         ident: username,
-        //         pass: password,
-        //         uid: username
-        //     })
-        // })).json()
-
-        console.log(loginResult)
-    }
-
-    logout() {
-        this.sessionStore.logout()
-    }
+	logout() {
+		this.sessionStore.logout();
+	}
 }

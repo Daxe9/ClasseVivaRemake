@@ -1,12 +1,9 @@
 <script setup lang="ts">
-import AverageGrade from '@/components/AverageGrade.vue'
-
+import AverageGrade from "@/components/AverageGrade.vue";
 </script>
 
 <template>
-<AverageGrade/>
+	<AverageGrade />
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

@@ -1,16 +1,11 @@
-import ClasseVivaAPI from '@/services/ClasseVivaAPI'
-import { defineStore } from 'pinia'
+import ClasseVivaAPI from "@/services/ClasseVivaAPI";
+import { defineStore } from "pinia";
 
-interface API
-{
+interface API {}
 
-}
-
-export const useAPIStore = defineStore('api', {
-  state: () => ({
-    api: new ClasseVivaAPI()
-  }),
-  actions: {
-
-  }
-})
+export const useAPIStore = defineStore("api", {
+	state: () => ({
+		api: new ClasseVivaAPI()
+	}),
+	actions: {}
+});
