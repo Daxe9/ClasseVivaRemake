@@ -20,6 +20,7 @@
     "webfontloader": "^1.0.0"
   },
   "devDependencies": {
+    "@tauri-apps/cli": "^1.2.3",
     "@types/node": "^18.11.12",
     "@types/webfontloader": "^1.0.0",
     "@vitejs/plugin-vue": "^4.0.0",
