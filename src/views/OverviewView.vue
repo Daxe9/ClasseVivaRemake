@@ -2,7 +2,7 @@
 
 <template>
 	<div>
-		<h1>Homework</h1>
+		<h1>Overview</h1>
 	</div>
 </template>
 

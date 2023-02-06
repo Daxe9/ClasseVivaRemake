@@ -1,62 +1,40 @@
 <script lang="ts" setup>
+import { useStudentInfoStore } from "./stores/studentInfo";
+import ListRoutes from "./components/ListRoutes.vue";
+import { ref } from "vue";
+
+const studentInfo = useStudentInfoStore();
+const isLogged = ref<boolean>(false);
+const fullName = ref<string>("");
+const ident = localStorage.getItem("ident");
+const token = localStorage.getItem("token");
+
+if (ident && token) {
+	studentInfo.setIdent(ident);
+	studentInfo.setToken(token);
+}
+
+studentInfo.$subscribe((_, state) => {
+	isLogged.value = !!state.token;
+	fullName.value = state.firstName + " " + state.lastName;
+});
 </script>
 
 <template>
 	<v-app>
 		<v-card>
 			<v-layout>
-				<v-app-bar title="ClasseViva Remake" />
+				<v-app-bar>
+					<v-app-bar-title>ClasseViva Remake</v-app-bar-title>
+					<v-spacer />
+					<v-avatar
+						v-if="isLogged"
+						icon="mdi-checkbox-marked-circle"
+					></v-avatar>
+					<h3 class="logged-fullname">{{ fullName }}</h3>
+				</v-app-bar>
 				<v-navigation-drawer expand-on-hover rail permanent>
-					<v-list>
-						<v-list-item
-							prepend-icon="mdi-account"
-							title="Profilo"
-							value="profile"
-                            to="/profile"
-						/>
-						<v-list-item
-							prepend-icon="mdi-home-city"
-							title="Panoramica"
-							value="home"
-                            to="/"
-						/>
-						<v-list-item
-							prepend-icon="mdi-marker"
-							title="Voti"
-							value="grades"
-                            to="/grades"
-						/>
-						<v-list-item
-							prepend-icon="mdi-book-alert"
-							title="Compiti"
-							value="homework"
-                            to="/homework"
-						/>
-						<v-list-item
-							prepend-icon="mdi-bell-alert"
-							title="Comunicazioni"
-							value="documents"
-                            to="/documents"
-						/>
-						<v-list-item
-							prepend-icon="mdi-account-off"
-							title="Assenze"
-							value="events"
-                            to="/events"
-						/>
-						<v-list-item
-							prepend-icon="mdi-folder-multiple"
-							title="Argomenti Lezione"
-							value="lessons"
-                            to="/lessons"
-						/>
-						<v-list-item
-							prepend-icon="mdi-alert"
-							title="Sanzioni Disciplinari"
-							value="notes"
-                            to="/notes"
-						/>
-					</v-list>
+					<ListRoutes />
 				</v-navigation-drawer>
 				<v-main style="min-height: 100vh">
 					<router-view> </router-view>
@@ -66,4 +44,8 @@
 	</v-app>
 </template>
 
-<style scoped></style>
+<style scoped>
+.logged-fullname {
+	margin-right: 1.5em;
+}
+</style>

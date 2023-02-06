@@ -10,6 +10,11 @@ const router = createRouter({
 			component: () => import("../views/LoginView.vue")
 		},
 		{
+			path: "/absences",
+			name: "absences",
+			component: () => import("../views/AbsencesView.vue")
+		},
+		{
 			path: "/login",
 			name: "login",
 			component: () => import("../views/LoginView.vue")
@@ -48,8 +53,25 @@ const router = createRouter({
 			path: "/notes",
 			name: "notes",
 			component: () => import("../views/NotesView.vue")
+		},
+		{
+			path: "/overview",
+			name: "overview",
+			component: () => import("../views/OverviewView.vue")
 		}
 	]
+});
+
+router.beforeEach((to, _, next) => {
+	if (to.name === "login" && localStorage.getItem("token")) {
+		next({ name: "overview" });
+	}
+
+	if (to.name !== "login" && !localStorage.getItem("token")) {
+		next({ name: "login" });
+	} else {
+		next();
+	}
 });
 
 export default router;
