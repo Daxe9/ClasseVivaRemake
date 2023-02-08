@@ -1,8 +1,13 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { useStudentInfoStore } from "../stores/studentInfo";
+
+const studentInfo = useStudentInfoStore();
+
+</script>
 
 <template>
 	<div>
-		<h1>Lessons</h1>
+		<h1>lessons</h1>
 	</div>
 </template>
 

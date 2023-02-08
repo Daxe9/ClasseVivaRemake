@@ -24,8 +24,6 @@ export async function getRequest(route: string, headers?: any): Promise<any> {
 
 	try {
 		const result: any = await invoke("get_request", request);
-		console.log(result);
-
 		// parse body
 		result.body = JSON.parse(result.body);
 		if (result.body.hasOwnProperty("error")) {

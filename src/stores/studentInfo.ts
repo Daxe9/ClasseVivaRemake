@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import { getRequest, postRequest } from "../services/corsProxyService";
 
 export interface StudentInfo {
 	firstName: string;
@@ -21,7 +22,12 @@ export const useStudentInfoStore = defineStore("studentInfo", {
 		expire: "",
 		release: "",
 		studentId: "",
-		showPwdChangeReminder: false
+		showPwdChangeReminder: false,
+		grades: null,
+		absences: null,
+		didactis: null,
+		lessons: null,
+        notes: null
 	}),
 	getters: {
 		fullName(): string {
@@ -29,6 +35,13 @@ export const useStudentInfoStore = defineStore("studentInfo", {
 		}
 	},
 	actions: {
+		log() {
+            console.log(this.grades);
+            console.log(this.absences);
+            console.log(this.didactis);
+            console.log(this.lessons);
+            console.log(this.notes);
+		},
 		setStudentInfo(studentInfo: StudentInfo) {
 			this.firstName = studentInfo.firstName;
 			this.lastName = studentInfo.lastName;
@@ -47,6 +60,104 @@ export const useStudentInfoStore = defineStore("studentInfo", {
 		},
 		setToken(token: string) {
 			this.token = token;
-		}
+		},
+		async fetchAllInfo() {
+			const today = new Date();
+			const sevenDaysAgo = new Date(today);
+			sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+			const nextSevenDays = new Date(today);
+			nextSevenDays.setDate(nextSevenDays.getDate() + 2);
+
+			const getAbsences = async () => {
+				this.absences = await this.getAbsences();
+			};
+			const getGrades = async () => {
+				this.grades = await this.getGrades();
+			};
+			const getNotes = async () => {
+				this.notes = await this.getNotes();
+			};
+			const getLessons = async () => {
+				this.lessons = await this.getLessons(
+					sevenDaysAgo,
+					nextSevenDays
+				);
+			};
+
+            await Promise.all([getAbsences(), getGrades(), getNotes(), getLessons()]);
+		},
+		async getAbsences() {
+			if (!this.studentId || !this.token) {
+				throw new Error("studentId or token is not set");
+			}
+			return await getRequest(
+				`/students/${this.studentId}/absences/details`,
+				{
+					"z-auth-token": this.token
+				}
+			);
+		},
+		async getGrades() {
+			if (!this.studentId || !this.token) {
+				throw new Error("studentId or token is not set");
+			}
+			return await getRequest(`/students/${this.studentId}/grades`, {
+				"z-auth-token": this.token
+			});
+		},
+		// i dont know what are didactics
+		async getDidactics() {
+			if (!this.studentId || !this.token) {
+				throw new Error("studentId or token is not set");
+			}
+			return await getRequest(`/students/${this.studentId}/didactics`, {
+				"z-auth-token": this.token
+			});
+		},
+		async getLessons(start?: Date, end?: Date) {
+			if (!this.studentId || !this.token) {
+				throw new Error("studentId or token is not set");
+			}
+			let uri = `/students/${this.studentId}/lessons/`;
+
+			if (start) {
+				uri += getDateString(start);
+				uri += "/";
+			}
+			if (end) {
+				uri += getDateString(end);
+				uri += "/";
+			}
+
+			return await getRequest(uri, {
+				"z-auth-token": this.token
+			});
+		},
+        async getNotes() { 
+            if (!this.studentId || !this.token) {
+                throw new Error("studentId or token is not set");
+            }
+
+            return await getRequest(`/students/${this.studentId}/notes/all`, {
+                "z-auth-token": this.token,
+            });
+        }
 	}
 });
+
+// this function returns YYYYMMDD form date
+// e.g. 20210101
+function getDateString(date: Date) {
+	let dateString: string = date.getFullYear().toString();
+	const month = date.getMonth() + 1;
+	const day = date.getDate();
+	if (month < 10) {
+		dateString += "0";
+	}
+	dateString += month;
+	if (day < 10) {
+		dateString += "0";
+	}
+	dateString += day;
+	return dateString;
+}

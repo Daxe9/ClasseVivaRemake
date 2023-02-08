@@ -17,6 +17,9 @@ defineProps({
 
 async function submit() {
 	try {
+        if (import.meta.env.DEV) {
+            console.time("Login process")
+        }
 		const result = await postRequest("/auth/login", {
 			ident: userIdentifier.value,
 			uid: userIdentifier.value,
@@ -26,12 +29,16 @@ async function submit() {
 		// store ident and token in cache
 		localStorage.setItem("ident", userIdentifier.value);
 		localStorage.setItem("token", result.body.token);
-
+		studentInfo.setStudentInfo(result.body as StudentInfo);
 		if (import.meta.env.DEV) {
 			console.log("Logged in!");
+            console.time('Fetch information time');
 		}
-		studentInfo.setStudentInfo(result.body as StudentInfo);
-
+        await studentInfo.fetchAllInfo();
+		if (import.meta.env.DEV) {
+            console.timeEnd('Fetch information time');
+            console.timeEnd("Login process")
+		}
 		await router.push({ name: "overview" });
 	} catch (error: any) {
 		// TODO: handle error
