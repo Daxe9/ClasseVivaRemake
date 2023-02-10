@@ -13,7 +13,6 @@ if (ident && token) {
 	studentInfo.setIdent(ident);
 	studentInfo.setToken(token);
 }
-
 studentInfo.$subscribe((_, state) => {
 	isLogged.value = !!state.token;
 	fullName.value = state.firstName + " " + state.lastName;

@@ -13,6 +13,7 @@ export interface StudentInfo {
 	showPwdChangeReminder: boolean;
 }
 
+// rest/v1/students/{studentId}/agenda/all/{begin}/{end}
 export const useStudentInfoStore = defineStore("studentInfo", {
 	state: () => ({
 		firstName: "",
@@ -27,7 +28,9 @@ export const useStudentInfoStore = defineStore("studentInfo", {
 		absences: null,
 		didactis: null,
 		lessons: null,
-        notes: null
+        notes: null,
+        homework: null,
+        agenda: null
 	}),
 	getters: {
 		fullName(): string {
@@ -67,6 +70,11 @@ export const useStudentInfoStore = defineStore("studentInfo", {
 			sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 			const nextSevenDays = new Date(today);
 			nextSevenDays.setDate(nextSevenDays.getDate() + 2);
+            const monthAgo = new Date(today);
+            monthAgo.setMonth(monthAgo.getMonth() - 1);
+            // get date of next month ago
+            const nextMonthAgo = new Date(today);
+            nextMonthAgo.setMonth(nextMonthAgo.getMonth() + 1);
 
 			const getAbsences = async () => {
 				this.absences = await this.getAbsences();
@@ -77,14 +85,21 @@ export const useStudentInfoStore = defineStore("studentInfo", {
 			const getNotes = async () => {
 				this.notes = await this.getNotes();
 			};
+			const getHomework = async () => {
+				this.homework = await this.getHomework();
+			};
 			const getLessons = async () => {
 				this.lessons = await this.getLessons(
 					sevenDaysAgo,
 					nextSevenDays
 				);
 			};
+            const getAgenda = async () => {
+                this.agenda = await this.getAgenda(monthAgo, nextMonthAgo);
+            }
 
-            await Promise.all([getAbsences(), getGrades(), getNotes(), getLessons()]);
+            await Promise.all([getAbsences(), getGrades(), getNotes(), getLessons(), getHomework(), getAgenda()]);
+            console.log(this.agenda);
 		},
 		async getAbsences() {
 			if (!this.studentId || !this.token) {
@@ -139,6 +154,33 @@ export const useStudentInfoStore = defineStore("studentInfo", {
             }
 
             return await getRequest(`/students/${this.studentId}/notes/all`, {
+                "z-auth-token": this.token,
+            });
+        },
+        async getHomework() { 
+            if (!this.studentId || !this.token) {
+                throw new Error("studentId or token is not set");
+            }
+
+            return await getRequest(`/students/${this.studentId}/homeworks`, {
+                "z-auth-token": this.token,
+            });
+        },
+        async getAgenda(start?: Date, end?: Date) {
+            if (!this.studentId || !this.token) {
+                throw new Error("studentId or token is not set");
+            }
+            let uri = `/students/${this.studentId}/agenda/all/`;
+			if (start) {
+				uri += getDateString(start);
+				uri += "/";
+			}
+			if (end) {
+				uri += getDateString(end);
+				uri += "/";
+			}
+            console.log(uri)
+            return await getRequest(uri, {
                 "z-auth-token": this.token,
             });
         }
