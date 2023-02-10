@@ -1,11 +1,14 @@
+// TODO: more abstraction
 import { defineStore } from "pinia";
 import { getRequest, postRequest } from "../services/corsProxyService";
+import { clearLocalStorage, clearSessionStorage } from "@/services/storages";
 
 export interface StudentInfo {
 	firstName: string;
 	lastName: string;
 	ident: string;
 	token: string;
+	password: string;
 	expire: string;
 	release: string;
 	studentId: string;
@@ -28,9 +31,9 @@ export const useStudentInfoStore = defineStore("studentInfo", {
 		absences: null,
 		didactis: null,
 		lessons: null,
-        notes: null,
-        homework: null,
-        agenda: null
+		notes: null,
+		homework: null,
+		agenda: null
 	}),
 	getters: {
 		fullName(): string {
@@ -38,12 +41,12 @@ export const useStudentInfoStore = defineStore("studentInfo", {
 		}
 	},
 	actions: {
-		log() {
-            console.log(this.grades);
-            console.log(this.absences);
-            console.log(this.didactis);
-            console.log(this.lessons);
-            console.log(this.notes);
+		logout() {
+			// reset the student info
+			this.$reset();
+			// clear the local storage
+			clearLocalStorage();
+			clearSessionStorage();
 		},
 		setStudentInfo(studentInfo: StudentInfo) {
 			this.firstName = studentInfo.firstName;
@@ -70,11 +73,11 @@ export const useStudentInfoStore = defineStore("studentInfo", {
 			sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 			const nextSevenDays = new Date(today);
 			nextSevenDays.setDate(nextSevenDays.getDate() + 2);
-            const monthAgo = new Date(today);
-            monthAgo.setMonth(monthAgo.getMonth() - 1);
-            // get date of next month ago
-            const nextMonthAgo = new Date(today);
-            nextMonthAgo.setMonth(nextMonthAgo.getMonth() + 1);
+			const monthAgo = new Date(today);
+			monthAgo.setMonth(monthAgo.getMonth() - 1);
+			// get date of next month ago
+			const nextMonthAgo = new Date(today);
+			nextMonthAgo.setMonth(nextMonthAgo.getMonth() + 1);
 
 			const getAbsences = async () => {
 				this.absences = await this.getAbsences();
@@ -94,12 +97,18 @@ export const useStudentInfoStore = defineStore("studentInfo", {
 					nextSevenDays
 				);
 			};
-            const getAgenda = async () => {
-                this.agenda = await this.getAgenda(monthAgo, nextMonthAgo);
-            }
+			const getAgenda = async () => {
+				this.agenda = await this.getAgenda(monthAgo, nextMonthAgo);
+			};
 
-            await Promise.all([getAbsences(), getGrades(), getNotes(), getLessons(), getHomework(), getAgenda()]);
-            console.log(this.agenda);
+			await Promise.all([
+				getAbsences(),
+				getGrades(),
+				getNotes(),
+				getLessons(),
+				getHomework(),
+				getAgenda()
+			]);
 		},
 		async getAbsences() {
 			if (!this.studentId || !this.token) {
@@ -148,29 +157,29 @@ export const useStudentInfoStore = defineStore("studentInfo", {
 				"z-auth-token": this.token
 			});
 		},
-        async getNotes() { 
-            if (!this.studentId || !this.token) {
-                throw new Error("studentId or token is not set");
-            }
+		async getNotes() {
+			if (!this.studentId || !this.token) {
+				throw new Error("studentId or token is not set");
+			}
 
-            return await getRequest(`/students/${this.studentId}/notes/all`, {
-                "z-auth-token": this.token,
-            });
-        },
-        async getHomework() { 
-            if (!this.studentId || !this.token) {
-                throw new Error("studentId or token is not set");
-            }
+			return await getRequest(`/students/${this.studentId}/notes/all`, {
+				"z-auth-token": this.token
+			});
+		},
+		async getHomework() {
+			if (!this.studentId || !this.token) {
+				throw new Error("studentId or token is not set");
+			}
 
-            return await getRequest(`/students/${this.studentId}/homeworks`, {
-                "z-auth-token": this.token,
-            });
-        },
-        async getAgenda(start?: Date, end?: Date) {
-            if (!this.studentId || !this.token) {
-                throw new Error("studentId or token is not set");
-            }
-            let uri = `/students/${this.studentId}/agenda/all/`;
+			return await getRequest(`/students/${this.studentId}/homeworks`, {
+				"z-auth-token": this.token
+			});
+		},
+		async getAgenda(start?: Date, end?: Date) {
+			if (!this.studentId || !this.token) {
+				throw new Error("studentId or token is not set");
+			}
+			let uri = `/students/${this.studentId}/agenda/all/`;
 			if (start) {
 				uri += getDateString(start);
 				uri += "/";
@@ -179,11 +188,10 @@ export const useStudentInfoStore = defineStore("studentInfo", {
 				uri += getDateString(end);
 				uri += "/";
 			}
-            console.log(uri)
-            return await getRequest(uri, {
-                "z-auth-token": this.token,
-            });
-        }
+			return await getRequest(uri, {
+				"z-auth-token": this.token
+			});
+		}
 	}
 });
 

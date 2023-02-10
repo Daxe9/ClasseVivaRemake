@@ -1,4 +1,15 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { useStudentInfoStore } from "@/stores/studentInfo";
+import { useRouter } from "vue-router";
+
+const studentInfo = useStudentInfoStore();
+const router = useRouter();
+
+async function logout() {
+	studentInfo.logout();
+	await router.push({ name: "login" });
+}
+</script>
 
 <template>
 	<v-list>
@@ -55,6 +66,12 @@
 			title="Sanzioni Disciplinari"
 			value="notes"
 			to="/notes"
+		/>
+		<v-list-item
+			prepend-icon="mdi-account-off"
+			title="Logout"
+			value="logout"
+			@click="logout"
 		/>
 	</v-list>
 </template>

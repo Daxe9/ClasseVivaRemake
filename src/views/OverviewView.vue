@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { useStudentInfoStore } from '@/stores/studentInfo';
+import { useStudentInfoStore } from "@/stores/studentInfo";
 
 const studentInfo = useStudentInfoStore();
 function f() {
-    studentInfo.log()
+	studentInfo.log();
 }
 </script>
 

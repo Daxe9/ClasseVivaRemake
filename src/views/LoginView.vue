@@ -4,6 +4,7 @@ import { ref } from "vue";
 import { postRequest } from "../services/corsProxyService";
 import { useStudentInfoStore, type StudentInfo } from "../stores/studentInfo";
 import { useRouter } from "vue-router";
+import { setLocalStorage, setSessionStorage } from "@/services/storages";
 
 const router = useRouter();
 const userIdentifier = ref("");
@@ -17,27 +18,35 @@ defineProps({
 
 async function submit() {
 	try {
-        if (import.meta.env.DEV) {
-            console.time("Login process")
-        }
+		if (import.meta.env.DEV) {
+			console.time("Login process");
+		}
 		const result = await postRequest("/auth/login", {
 			ident: userIdentifier.value,
 			uid: userIdentifier.value,
 			pass: password.value
 		});
 
-		// store ident and token in cache
-		localStorage.setItem("ident", userIdentifier.value);
-		localStorage.setItem("token", result.body.token);
+		// store student information
 		studentInfo.setStudentInfo(result.body as StudentInfo);
+
+		// store student information in local storage
+		setLocalStorage(
+			result.body.firstName,
+			result.body.lastName,
+			userIdentifier.value,
+			result.body.token
+		);
+		// store expire time in session storage
+		setSessionStorage(result.body.expire);
 		if (import.meta.env.DEV) {
 			console.log("Logged in!");
-            console.time('Fetch information time');
+			console.time("Fetch information time");
 		}
-        await studentInfo.fetchAllInfo();
+		await studentInfo.fetchAllInfo();
 		if (import.meta.env.DEV) {
-            console.timeEnd('Fetch information time');
-            console.timeEnd("Login process")
+			console.timeEnd("Fetch information time");
+			console.timeEnd("Login process");
 		}
 		await router.push({ name: "overview" });
 	} catch (error: any) {

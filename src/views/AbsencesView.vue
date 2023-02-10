@@ -13,7 +13,7 @@ onMounted(async () => {
 
 async function getAbsences() {
 	try {
-        result.value = studentInfo.absences;
+		result.value = studentInfo.absences;
 	} catch (error: any) {
 		if (import.meta.env.DEV) {
 			console.error(error);

@@ -1,22 +1,34 @@
+<!-- TODO: CHECK WHETHER SESSION IS EXPIRED EVERYTIME SOME TYPE OF ACTION IS CALLED -->
+
 <script lang="ts" setup>
 import { useStudentInfoStore } from "./stores/studentInfo";
 import ListRoutes from "./components/ListRoutes.vue";
 import { ref } from "vue";
+import { getLocalStorage, type CachedStudentInfo } from "@/services/storages";
 
 const studentInfo = useStudentInfoStore();
-const isLogged = ref<boolean>(false);
-const fullName = ref<string>("");
-const ident = localStorage.getItem("ident");
-const token = localStorage.getItem("token");
+const isLogged = ref<boolean>(!!studentInfo.token ?? false);
+const fullName = ref<string>(studentInfo.fullName ?? "");
+const cachedStudentInfo: CachedStudentInfo | null = getLocalStorage();
 
-if (ident && token) {
-	studentInfo.setIdent(ident);
-	studentInfo.setToken(token);
-}
 studentInfo.$subscribe((_, state) => {
 	isLogged.value = !!state.token;
 	fullName.value = state.firstName + " " + state.lastName;
 });
+
+// check whether there's a cached student info
+if (cachedStudentInfo) {
+	studentInfo.$patch({
+		ident: cachedStudentInfo.ident,
+		token: cachedStudentInfo.token,
+		firstName: cachedStudentInfo.firstName,
+		lastName: cachedStudentInfo.lastName,
+		studentId: cachedStudentInfo.ident.substring(
+			1,
+			cachedStudentInfo.ident.length - 1
+		)
+	});
+}
 </script>
 
 <template>

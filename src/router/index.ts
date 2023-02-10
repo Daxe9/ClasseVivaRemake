@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { createRouter, createWebHistory } from "vue-router";
+import { useStudentInfoStore } from "@/stores/studentInfo";
 
 const router = createRouter({
 	history: createWebHistory(import.meta.env.BASE_URL),
@@ -63,15 +64,18 @@ const router = createRouter({
 });
 
 router.beforeEach((to, _, next) => {
-	if (to.name === "login" && localStorage.getItem("token")) {
+	const studentInfoStore = useStudentInfoStore();
+
+	// if the user is logged in and tries to access the login page, redirect to overview page
+	if (to.name === "login" && studentInfoStore.token) {
 		next({ name: "overview" });
 	}
 
-	if (to.name !== "login" && !localStorage.getItem("token")) {
+	// if the user is not logged in and tries to access a page other than login, redirect to login page
+	if (to.name !== "login" && !studentInfoStore.token) {
 		next({ name: "login" });
-	} else {
-		next();
 	}
+	next();
 });
 
 export default router;

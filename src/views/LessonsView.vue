@@ -2,7 +2,6 @@
 import { useStudentInfoStore } from "../stores/studentInfo";
 
 const studentInfo = useStudentInfoStore();
-
 </script>
 
 <template>
