@@ -5,8 +5,8 @@ import {
 	setSessionStorage,
 	getLocalStorage,
 	type CachedStudentInfo,
-    clearLocalStorage,
-    clearSessionStorage
+	clearLocalStorage,
+	clearSessionStorage
 } from "./storages";
 
 export function relogin() {
@@ -24,7 +24,7 @@ export function relogin() {
 				cachedStudentInfo.ident.length - 1
 			)
 		});
-        studentInfo.fetchAllInfo().then(() => ({}));
+		studentInfo.fetchAllInfo().then(() => ({}));
 	}
 }
 
@@ -55,7 +55,7 @@ export async function login(ident: string, pass: string) {
 		console.log("Logged in!");
 		console.time("Fetch information time");
 	}
-    // fetch all information
+	// fetch all information
 	await studentInfo.fetchAllInfo();
 	if (import.meta.env.DEV) {
 		console.timeEnd("Fetch information time");
@@ -66,7 +66,7 @@ export async function login(ident: string, pass: string) {
 export function logout() {
 	const studentInfo = useStudentInfoStore();
 
-    studentInfo.$reset();
-    clearLocalStorage();
-    clearSessionStorage();
+	studentInfo.$reset();
+	clearLocalStorage();
+	clearSessionStorage();
 }

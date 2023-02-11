@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
-import {logout} from "@/services/auth"
+import { logout } from "@/services/auth";
 
 const router = useRouter();
 
 async function logoutHandler() {
-    logout();
+	logout();
 	await router.push({ name: "login" });
 }
 </script>
