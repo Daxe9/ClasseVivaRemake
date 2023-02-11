@@ -4,31 +4,18 @@
 import { useStudentInfoStore } from "./stores/studentInfo";
 import ListRoutes from "./components/ListRoutes.vue";
 import { ref } from "vue";
-import { getLocalStorage, type CachedStudentInfo } from "@/services/storages";
+import { relogin } from "./services/auth";
 
 const studentInfo = useStudentInfoStore();
 const isLogged = ref<boolean>(!!studentInfo.token);
 const fullName = ref<string>(studentInfo.fullName);
-const cachedStudentInfo: CachedStudentInfo | null = getLocalStorage();
 
 studentInfo.$subscribe((_, state) => {
 	isLogged.value = !!state.token;
 	fullName.value = state.firstName + " " + state.lastName;
 });
 
-// check whether there's a cached student info
-if (cachedStudentInfo) {
-	studentInfo.$patch({
-		ident: cachedStudentInfo.ident,
-		token: cachedStudentInfo.token,
-		firstName: cachedStudentInfo.firstName,
-		lastName: cachedStudentInfo.lastName,
-		studentId: cachedStudentInfo.ident.substring(
-			1,
-			cachedStudentInfo.ident.length - 1
-		)
-	});
-}
+relogin();
 </script>
 
 <template>

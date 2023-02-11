@@ -1,6 +1,6 @@
 // TODO: more abstraction
 import { defineStore } from "pinia";
-import { getRequest, postRequest } from "../services/corsProxyService";
+import { getRequest } from "../services/corsProxyService";
 import { clearLocalStorage, clearSessionStorage } from "@/services/storages";
 
 export interface StudentInfo {
@@ -40,13 +40,6 @@ export const useStudentInfoStore = defineStore("studentInfo", {
 		}
 	},
 	actions: {
-		logout() {
-			// reset the student info
-			this.$reset();
-			// clear the local storage
-			clearLocalStorage();
-			clearSessionStorage();
-		},
 		setStudentInfo(studentInfo: StudentInfo) {
 			this.firstName = studentInfo.firstName;
 			this.lastName = studentInfo.lastName;
@@ -67,7 +60,7 @@ export const useStudentInfoStore = defineStore("studentInfo", {
 			this.token = token;
 		},
 		async fetchAllInfo() {
-            // TODO: add date range handlering 
+			// TODO: add date range handlering
 
 			const today = new Date();
 			const sevenDaysAgo = new Date(today);
@@ -111,20 +104,26 @@ export const useStudentInfoStore = defineStore("studentInfo", {
 			if (!this.studentId || !this.token) {
 				throw new Error("studentId or token is not set");
 			}
-			return await getRequest(
+			const result = await getRequest(
 				`/students/${this.studentId}/absences/details`,
 				{
 					"z-auth-token": this.token
 				}
 			);
+			return result.body;
 		},
 		async getGrades() {
 			if (!this.studentId || !this.token) {
 				throw new Error("studentId or token is not set");
 			}
-			return await getRequest(`/students/${this.studentId}/grades`, {
-				"z-auth-token": this.token
-			});
+			const result = await getRequest(
+				`/students/${this.studentId}/grades`,
+				{
+					"z-auth-token": this.token
+				}
+			);
+
+			return result.body;
 		},
 		// i dont know what are didactics
 		async getDidactics() {
@@ -150,26 +149,31 @@ export const useStudentInfoStore = defineStore("studentInfo", {
 				uri += "/";
 			}
 
-			return await getRequest(uri, {
+			const result = await getRequest(uri, {
 				"z-auth-token": this.token
 			});
+			return result.body;
 		},
 		async getNotes() {
 			if (!this.studentId || !this.token) {
 				throw new Error("studentId or token is not set");
 			}
 
-			return await getRequest(`/students/${this.studentId}/notes/all`, {
-				"z-auth-token": this.token
-			});
+			const result = await getRequest(
+				`/students/${this.studentId}/notes/all`,
+				{
+					"z-auth-token": this.token
+				}
+			);
+			return result.body;
 		},
 		async getAgenda(start: Date, end: Date) {
 			if (!this.studentId || !this.token) {
 				throw new Error("studentId or token is not set");
 			}
 			let uri = `/students/${this.studentId}/agenda/all/`;
-            
-            // check whether start and end are set
+
+			// check whether start and end are set
 			if (start) {
 				uri += getDateString(start);
 				uri += "/";
@@ -178,9 +182,10 @@ export const useStudentInfoStore = defineStore("studentInfo", {
 				uri += getDateString(end);
 				uri += "/";
 			}
-			return await getRequest(uri, {
+			const result = await getRequest(uri, {
 				"z-auth-token": this.token
 			});
+			return result.body;
 		}
 	}
 });

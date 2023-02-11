@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { login } from "@/services/login";
+import { login } from "@/services/auth";
 
 const router = useRouter();
 const userIdentifier = ref("");
@@ -9,7 +9,7 @@ const password = ref("");
 
 async function submit() {
 	try {
-        await login(userIdentifier.value, password.value);
+		await login(userIdentifier.value, password.value);
 		await router.push({ name: "overview" });
 	} catch (error: any) {
 		// TODO: handle error
@@ -27,7 +27,6 @@ async function submit() {
 			<v-card-title class="login-card-title">
 				<h3>ClasseViva</h3>
 			</v-card-title>
-			<!-- <img :src="CVLogo" width="550" /> -->
 			<form @submit.prevent="submit">
 				<v-text-field
 					v-model="userIdentifier"

@@ -1,13 +1,7 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
-import { useStudentInfoStore } from "../stores/studentInfo";
-import { useRouter } from "vue-router";
+import { subscribeTo } from "@/composables/studentStore";
 
-const studentInfo = useStudentInfoStore();
-const router = useRouter();
-const absences = ref(studentInfo.absences);
-
-
+const absences = subscribeTo("absences");
 </script>
 
 <template>

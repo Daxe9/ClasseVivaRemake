@@ -1,11 +1,35 @@
 import { postRequest } from "./corsProxyService";
 import { useStudentInfoStore, type StudentInfo } from "@/stores/studentInfo";
-import { setLocalStorage, setSessionStorage } from "./storages";
+import {
+	setLocalStorage,
+	setSessionStorage,
+	getLocalStorage,
+	type CachedStudentInfo,
+    clearLocalStorage,
+    clearSessionStorage
+} from "./storages";
 
-export function relogin() {}
+export function relogin() {
+	const studentInfo = useStudentInfoStore();
+	const cachedStudentInfo: CachedStudentInfo | null = getLocalStorage();
+
+	if (cachedStudentInfo) {
+		studentInfo.$patch({
+			ident: cachedStudentInfo.ident,
+			token: cachedStudentInfo.token,
+			firstName: cachedStudentInfo.firstName,
+			lastName: cachedStudentInfo.lastName,
+			studentId: cachedStudentInfo.ident.substring(
+				1,
+				cachedStudentInfo.ident.length - 1
+			)
+		});
+        studentInfo.fetchAllInfo().then(() => ({}));
+	}
+}
 
 export async function login(ident: string, pass: string) {
-    const studentInfo = useStudentInfoStore();
+	const studentInfo = useStudentInfoStore();
 	if (import.meta.env.DEV) {
 		console.time("Login process");
 	}
@@ -31,9 +55,18 @@ export async function login(ident: string, pass: string) {
 		console.log("Logged in!");
 		console.time("Fetch information time");
 	}
+    // fetch all information
 	await studentInfo.fetchAllInfo();
 	if (import.meta.env.DEV) {
 		console.timeEnd("Fetch information time");
 		console.timeEnd("Login process");
 	}
+}
+
+export function logout() {
+	const studentInfo = useStudentInfoStore();
+
+    studentInfo.$reset();
+    clearLocalStorage();
+    clearSessionStorage();
 }

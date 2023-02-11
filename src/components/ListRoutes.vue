@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { useStudentInfoStore } from "@/stores/studentInfo";
 import { useRouter } from "vue-router";
+import {logout} from "@/services/auth"
 
-const studentInfo = useStudentInfoStore();
 const router = useRouter();
 
-async function logout() {
-	studentInfo.logout();
+async function logoutHandler() {
+    logout();
 	await router.push({ name: "login" });
 }
 </script>
@@ -71,7 +70,7 @@ async function logout() {
 			prepend-icon="mdi-logout"
 			title="Logout"
 			value="logout"
-			@click="logout"
+			@click="logoutHandler"
 		/>
 	</v-list>
 </template>

@@ -68,12 +68,12 @@ router.beforeEach((to, _, next) => {
 
 	// if the user is logged in and tries to access the login page, redirect to overview page
 	if (to.name === "login" && studentInfoStore.token) {
-		next({ name: "overview" });
+		return next({ name: "overview" });
 	}
 
 	// if the user is not logged in and tries to access a page other than login, redirect to login page
 	if (to.name !== "login" && !studentInfoStore.token) {
-		next({ name: "login" });
+		return next({ name: "login" });
 	}
 	next();
 });
