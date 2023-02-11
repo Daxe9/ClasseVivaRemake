@@ -5,30 +5,16 @@ import { useRouter } from "vue-router";
 
 const studentInfo = useStudentInfoStore();
 const router = useRouter();
-const result = ref();
+const absences = ref(studentInfo.absences);
 
-onMounted(async () => {
-	await getAbsences();
-});
 
-async function getAbsences() {
-	try {
-		result.value = studentInfo.absences;
-	} catch (error: any) {
-		if (import.meta.env.DEV) {
-			console.error(error);
-		}
-		await router.push("/error");
-	}
-}
 </script>
 
 <template>
-	<div @click="getAbsences">Click me</div>
 	<div>
 		<pre>
             <code>
-                {{ result ? result.body : "No data"}}
+                {{ absences ?? "No data"}}
             </code>
         </pre>
 	</div>

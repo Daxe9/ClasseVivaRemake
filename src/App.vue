@@ -7,8 +7,8 @@ import { ref } from "vue";
 import { getLocalStorage, type CachedStudentInfo } from "@/services/storages";
 
 const studentInfo = useStudentInfoStore();
-const isLogged = ref<boolean>(!!studentInfo.token ?? false);
-const fullName = ref<string>(studentInfo.fullName ?? "");
+const isLogged = ref<boolean>(!!studentInfo.token);
+const fullName = ref<string>(studentInfo.fullName);
 const cachedStudentInfo: CachedStudentInfo | null = getLocalStorage();
 
 studentInfo.$subscribe((_, state) => {

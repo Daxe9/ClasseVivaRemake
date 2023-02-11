@@ -32,7 +32,6 @@ export const useStudentInfoStore = defineStore("studentInfo", {
 		didactis: null,
 		lessons: null,
 		notes: null,
-		homework: null,
 		agenda: null
 	}),
 	getters: {
@@ -68,6 +67,8 @@ export const useStudentInfoStore = defineStore("studentInfo", {
 			this.token = token;
 		},
 		async fetchAllInfo() {
+            // TODO: add date range handlering 
+
 			const today = new Date();
 			const sevenDaysAgo = new Date(today);
 			sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
@@ -88,9 +89,6 @@ export const useStudentInfoStore = defineStore("studentInfo", {
 			const getNotes = async () => {
 				this.notes = await this.getNotes();
 			};
-			const getHomework = async () => {
-				this.homework = await this.getHomework();
-			};
 			const getLessons = async () => {
 				this.lessons = await this.getLessons(
 					sevenDaysAgo,
@@ -106,7 +104,6 @@ export const useStudentInfoStore = defineStore("studentInfo", {
 				getGrades(),
 				getNotes(),
 				getLessons(),
-				getHomework(),
 				getAgenda()
 			]);
 		},
@@ -166,20 +163,13 @@ export const useStudentInfoStore = defineStore("studentInfo", {
 				"z-auth-token": this.token
 			});
 		},
-		async getHomework() {
-			if (!this.studentId || !this.token) {
-				throw new Error("studentId or token is not set");
-			}
-
-			return await getRequest(`/students/${this.studentId}/homeworks`, {
-				"z-auth-token": this.token
-			});
-		},
-		async getAgenda(start?: Date, end?: Date) {
+		async getAgenda(start: Date, end: Date) {
 			if (!this.studentId || !this.token) {
 				throw new Error("studentId or token is not set");
 			}
 			let uri = `/students/${this.studentId}/agenda/all/`;
+            
+            // check whether start and end are set
 			if (start) {
 				uri += getDateString(start);
 				uri += "/";

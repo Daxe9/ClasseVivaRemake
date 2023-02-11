@@ -68,7 +68,7 @@ async function logout() {
 			to="/notes"
 		/>
 		<v-list-item
-			prepend-icon="mdi-account-off"
+			prepend-icon="mdi-logout"
 			title="Logout"
 			value="logout"
 			@click="logout"

@@ -1,53 +1,15 @@
 <script setup lang="ts">
 import { ref } from "vue";
-/* import CVLogo from "../assets/spaggiari_logo.png"; */
-import { postRequest } from "../services/corsProxyService";
-import { useStudentInfoStore, type StudentInfo } from "../stores/studentInfo";
 import { useRouter } from "vue-router";
-import { setLocalStorage, setSessionStorage } from "@/services/storages";
+import { login } from "@/services/login";
 
 const router = useRouter();
 const userIdentifier = ref("");
 const password = ref("");
-const studentInfo = useStudentInfoStore();
-
-defineProps({
-	email: String,
-	password: String
-});
 
 async function submit() {
 	try {
-		if (import.meta.env.DEV) {
-			console.time("Login process");
-		}
-		const result = await postRequest("/auth/login", {
-			ident: userIdentifier.value,
-			uid: userIdentifier.value,
-			pass: password.value
-		});
-
-		// store student information
-		studentInfo.setStudentInfo(result.body as StudentInfo);
-
-		// store student information in local storage
-		setLocalStorage(
-			result.body.firstName,
-			result.body.lastName,
-			userIdentifier.value,
-			result.body.token
-		);
-		// store expire time in session storage
-		setSessionStorage(result.body.expire);
-		if (import.meta.env.DEV) {
-			console.log("Logged in!");
-			console.time("Fetch information time");
-		}
-		await studentInfo.fetchAllInfo();
-		if (import.meta.env.DEV) {
-			console.timeEnd("Fetch information time");
-			console.timeEnd("Login process");
-		}
+        await login(userIdentifier.value, password.value);
 		await router.push({ name: "overview" });
 	} catch (error: any) {
 		// TODO: handle error
