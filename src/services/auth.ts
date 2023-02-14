@@ -6,10 +6,12 @@ import {
 	getLocalStorage,
 	type CachedStudentInfo,
 	clearLocalStorage,
-	clearSessionStorage
+	clearSessionStorage,
+    isExpired
 } from "./storages";
 
 export function relogin() {
+    if (isExpired()) return;
 	const studentInfo = useStudentInfoStore();
 	const cachedStudentInfo: CachedStudentInfo | null = getLocalStorage();
 
@@ -26,6 +28,12 @@ export function relogin() {
 		});
 		studentInfo.fetchAllInfo().then(() => ({}));
 	}
+
+    if (import.meta.env.DEV) {
+        setTimeout(() => {
+            studentInfo.log();
+        }, 1000)
+    }
 }
 
 export async function login(ident: string, pass: string) {
