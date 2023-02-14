@@ -2,6 +2,7 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { login } from "@/services/auth";
+import logo from "@/assets/spaggiari_logo.png"
 
 const router = useRouter();
 const userIdentifier = ref("");
@@ -23,10 +24,13 @@ async function submit() {
 
 <template>
 	<div class="login-wrapper">
+        <v-container>
+            <h1 class="text-center">ClasseViva Studenti</h1>
+        </v-container>
 		<v-card class="login-card">
-			<v-card-title class="login-card-title">
-				<h3>ClasseViva</h3>
-			</v-card-title>
+            <v-img :src="logo">
+                
+            </v-img>
 			<form @submit.prevent="submit">
 				<v-text-field
 					v-model="userIdentifier"
@@ -54,12 +58,6 @@ async function submit() {
 </template>
 
 <style scoped>
-@import "../assets/main.css";
-
-h1 {
-	font-size: 3.5rem;
-	text-align: center;
-}
 
 .accent {
 	background: var(--accent-color);
@@ -71,13 +69,14 @@ h1 {
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
+    color: white;
 }
 
 .login-card {
 	background: #1c1c1c;
 	padding: 20px;
-	margin: auto;
-	width: 30%;
+	width: 50%;
+    max-width: 500px;
 	text-align: center;
 }
 </style>

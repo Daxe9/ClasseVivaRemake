@@ -4,14 +4,18 @@ import {
 	setLocalStorage,
 	setSessionStorage,
 	getLocalStorage,
-	type CachedStudentInfo,
 	clearLocalStorage,
 	clearSessionStorage,
-    isExpired
+    isExpired,
+	type CachedStudentInfo
 } from "./storages";
 
 export function relogin() {
-    if (isExpired()) return;
+    if (isExpired()) {
+        clearSessionStorage();
+        logout();
+        return;
+    }
 	const studentInfo = useStudentInfoStore();
 	const cachedStudentInfo: CachedStudentInfo | null = getLocalStorage();
 
