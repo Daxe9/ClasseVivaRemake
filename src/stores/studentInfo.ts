@@ -1,24 +1,36 @@
 // TODO: more abstraction
 import { defineStore } from "pinia";
 import { getRequest } from "../services/corsProxyService";
-import { clearLocalStorage, clearSessionStorage } from "@/services/storages";
+import type {
+	Lesson,
+	Absence,
+	Grade,
+	Subject,
+    Agenda
+} from "@/types/studentInfoTypes";
 
 export interface StudentInfo {
 	firstName: string;
 	lastName: string;
 	ident: string;
 	token: string;
-	password: string;
 	expire: string;
 	release: string;
 	studentId: string;
 	// what the hell is this?
 	showPwdChangeReminder: boolean;
+    grades: null | Grade;
+    absences: null | Absence;
+    lessons: null | Lesson,
+    notes: null | Record<string, any>;
+    agenda: null | Agenda;
+    didactis: null | any;
+    subjects: null | Subject;
 }
 
 // rest/v1/students/{studentId}/agenda/all/{begin}/{end}
 export const useStudentInfoStore = defineStore("studentInfo", {
-	state: () => ({
+	state: (): StudentInfo => ({
 		firstName: "",
 		lastName: "",
 		ident: "",
@@ -32,7 +44,8 @@ export const useStudentInfoStore = defineStore("studentInfo", {
 		didactis: null,
 		lessons: null,
 		notes: null,
-		agenda: null
+		agenda: null,
+		subjects: null
 	}),
 	getters: {
 		fullName(): string {
@@ -40,6 +53,14 @@ export const useStudentInfoStore = defineStore("studentInfo", {
 		}
 	},
 	actions: {
+		log() {
+			console.log(this.grades);
+			console.log(this.absences);
+			console.log(this.lessons);
+			console.log(this.notes);
+			console.log(this.agenda);
+			console.log(this.subjects);
+		},
 		setStudentInfo(studentInfo: StudentInfo) {
 			this.firstName = studentInfo.firstName;
 			this.lastName = studentInfo.lastName;
@@ -82,6 +103,9 @@ export const useStudentInfoStore = defineStore("studentInfo", {
 			const getNotes = async () => {
 				this.notes = await this.getNotes();
 			};
+			const getSubjects = async () => {
+				this.subjects = await this.getSubjects();
+			};
 			const getLessons = async () => {
 				this.lessons = await this.getLessons(
 					sevenDaysAgo,
@@ -97,7 +121,8 @@ export const useStudentInfoStore = defineStore("studentInfo", {
 				getGrades(),
 				getNotes(),
 				getLessons(),
-				getAgenda()
+				getAgenda(),
+				getSubjects()
 			]);
 		},
 		async getAbsences() {
@@ -185,6 +210,18 @@ export const useStudentInfoStore = defineStore("studentInfo", {
 			const result = await getRequest(uri, {
 				"z-auth-token": this.token
 			});
+			return result.body;
+		},
+		async getSubjects() {
+			if (!this.studentId || !this.token) {
+				throw new Error("studentId or token is not set");
+			}
+			const result = await getRequest(
+				`/students/${this.studentId}/subjects`,
+				{
+					"z-auth-token": this.token
+				}
+			);
 			return result.body;
 		}
 	}
