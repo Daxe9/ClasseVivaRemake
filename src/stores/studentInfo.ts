@@ -24,7 +24,7 @@ export interface StudentInfo {
     lessons: null | Lesson,
     notes: null | Record<string, any>;
     agenda: null | Agenda;
-    didactis: null | any;
+    didactics: null | any;
     subjects: null | Subject;
 }
 
@@ -41,7 +41,7 @@ export const useStudentInfoStore = defineStore("studentInfo", {
 		showPwdChangeReminder: false,
 		grades: null,
 		absences: null,
-		didactis: null,
+		didactics: null,
 		lessons: null,
 		notes: null,
 		agenda: null,

@@ -1,9 +1,14 @@
 <script setup lang="ts">
-import AverageGrade from "@/components/AverageGrade.vue";
+import { useStudentInfoStore } from "@/stores/studentInfo";
+import GradesOverview from "@/components/GradesOverview.vue";
+
+const studentInfo = useStudentInfoStore();
 </script>
 
 <template>
-	<AverageGrade />
+	<div>
+		<GradesOverview />
+	</div>
 </template>
 
 <style scoped></style>
